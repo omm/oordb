@@ -1029,7 +1029,6 @@ METHOD FUNCTION isReadOnly() CLASS TField
     result := ;
         ::table:READONLY .OR. ;
         ::FReadOnly .OR. ;
-        ( ::table:State != dsBrowse .AND. ::AutoIncrement ) .OR. ;
         ( ::FIndexMasterAutoIncKey .AND. ( ::table:state != dsInsert .OR. ! ::value == ::getEmptyValue() ) )
 
 RETURN result
@@ -1441,7 +1440,7 @@ METHOD PROCEDURE SetData( value, initialize ) CLASS TField
     IF ::AutoIncrement
 
         IF value != NIL
-            RAISE TFIELD ::Name ERROR "Not allowed custom value in AutoIncrement Field..."
+            //RAISE TFIELD ::Name ERROR "Not allowed custom value in AutoIncrement Field..."
         ENDIF
 
         /*
@@ -1975,6 +1974,7 @@ METHOD FUNCTION ValidateResult_TableLogic( showAlert, value ) CLASS TField
             indexWarnMsg := index:WarnMsg
             IF !Empty( value ) .AND. index:existsKey( ::GetKeyVal( value, index:KeyFlags ), ::table:RecNo )
                 result := iif( !Empty( indexWarnMsg ), indexWarnMsg, "'" + ::Name + "' <key value already exists> '" + AsString( value ) + "'" )
+                result += ";MasterKeyVal: " + index:masterKeyVal
                 result += ";Table: " + ::table:ClassName
                 result += ";Index: " + index:name
                 IF showAlert == .T.
